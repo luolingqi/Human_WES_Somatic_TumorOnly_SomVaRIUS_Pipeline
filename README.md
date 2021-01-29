@@ -31,6 +31,7 @@ The entire pipeline was built refering both GATK Best Practice for somatic calli
   
   * `step4_MutSig_deconstruction.sh` -- it takes a manifest file (as shown in the template table below) recording vcf files for the individual samples and gain/loss comparisons, deconstruct and plot the mutation signatures
     
+Table 1. Description of the workflow on the above-mention 4 steps
 Step1: Data Quality Checking & Preprocessing  |  Step2: Variant Calling, filtering & Annotation | Step3: Variant Gain/Loss Comparison (e.g. Parental v.s. Treated) | Step4: Mutation Signature Deconstruction
 -------------------------------------------   |  ---------------------------------------------- |  --------------------------------------------------------------- | ----------------------------------------
 Quality checking of raw fastq files <br/> **(Fastqc - run_fastqc.sh)**  |  Somatic Variant Calling and filtration <br/> **(SomVaRIUS - run_somvarius_and_Filter_tumor_only.sh)** | Variant Gain/Loss (Parental vs Treated) <br/> **(run_variants_gain_loss_treatment.vs.Parental.AF.0.05.sh)** |  
@@ -42,7 +43,24 @@ Hybrid selection quality metrics collection <br/> **(GATK HsMetrics - run_Collec
 Estimate and Apply MarkDuplicate and <br/> Base Quality Score recalibration <br/> **(GATK MarkDuplicate, BQSR  - run_markduplicate.sh)**  |  
 
 
-    
+Table 2. Sample Comparison Manifest file as a template
+**Parental Sample** | **Treated Sample**
+------------------- | ------------------
+Sample_SW480_P8W_IGO_10212_G_2 | Sample_SW480_P0W_IGO_10212_G_1
+Sample_SW480_P8W_IGO_10212_G_2 | Sample_SW480_TMZ8W_IGO_10212_G_3
+Sample_SW480_P8W_IGO_10212_G_2 | Sample_SW480_CDDP8W_IGO_10212_G_4
+Sample_SW480_P8W_IGO_10212_G_2 | Sample_SW480_COMBO8W_IGO_10212_G_5
+
+Table 3. Mutation Signature Manifest file as a template
+**cats** | **comparison** | **files**
+-------- | -------------- | ---------
+Sample_SW480_COMBO8W_IGO_10212_G_5 | loss | PITT_0522/Sample_SW480_COMBO8W_IGO_10212_G_5_vs_Sample_SW480_P8W_IGO_10212_G_2.VEP.ann.AF0.05_BQ20_MQ50.vcf
+Sample_SW480_TMZ8W_IGO_10212_G_3 | loss | PITT_0522/Sample_SW480_TMZ8W_IGO_10212_G_3_vs_Sample_SW480_P8W_IGO_10212_G_2.VEP.ann.AF0.05_BQ20_MQ50.vcf
+Sample_SW480_CDDP8W_IGO_10212_G_4 | gain | PITT_0522/Sample_SW480_P8W_IGO_10212_G_2_vs_Sample_SW480_CDDP8W_IGO_10212_G_4.VEP.ann.AF0.05_BQ20_MQ50.vcf
+Sample_SW480_COMBO8W_IGO_10212_G_5 | gain | PITT_0522/Sample_SW480_P8W_IGO_10212_G_2_vs_Sample_SW480_COMBO8W_IGO_10212_G_5.VEP.ann.AF0.05_BQ20_MQ50.vcf
+Sample_SW480_CDDP8W_IGO_10212_G_4 | total | PITT_0522/Sample_SW480_CDDP8W_IGO_10212_G_4/Sample_SW480_CDDP8W_IGO_10212_G_4.aligned.duplicates_marked.recalibrated.targeted_sequencing.somvarius.tumor_only.sorted.rm_dbsnps.AF0.05_BQ20_MQ50.VEP.ann.vcf
+
+
 **Prerequisites for Running the Pipeline**<br/>
 
 * The entire pipeline was built on MSK High Performance Computing (HPC) platform with all the individual building blocks/tools developed in worry-free encapsulated enviroment (Singularity). So, there is little dependency to the system we log in on Lilac, which means, **_anyone with an active Lilac account and basic skill of linux_** can easily run it without any bothering of environment/parameters tuning.
