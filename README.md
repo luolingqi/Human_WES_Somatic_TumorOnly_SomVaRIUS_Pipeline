@@ -31,10 +31,10 @@ The entire pipeline was built refering both GATK Best Practice for somatic calli
   
   * `step4_MutSig_deconstruction.sh` -- it takes a manifest file (as shown in the template table below) recording vcf files for the individual samples and gain/loss comparisons, deconstruct and plot the mutation signatures
     
-Table 1. Description of the workflow on the above-mention 4 steps
-Step1: Data Quality Checking & Preprocessing  |  Step2: Variant Calling, filtering & Annotation | Step3: Variant Gain/Loss Comparison (e.g. Parental v.s. Treated) | Step4: Mutation Signature Deconstruction
+**Table 1. Description of the workflow on the above-mention 4 steps**
+Step1: Data Quality Checking & Preprocessing  |  Step2: Variant Calling, filtering & Annotation | Step3: Variant Gain/Loss Comparison (e.g. Parental v.s. Treated) | Step4: Mutation Signature Deconvolution
 -------------------------------------------   |  ---------------------------------------------- |  --------------------------------------------------------------- | ----------------------------------------
-Quality checking of raw fastq files <br/> **(Fastqc - run_fastqc.sh)**  |  Somatic Variant Calling and filtration <br/> **(SomVaRIUS - run_somvarius_and_Filter_tumor_only.sh)** | Variant Gain/Loss (Parental vs Treated) <br/> **(run_variants_gain_loss_treatment.vs.Parental.AF.0.05.sh)** |  
+Quality checking of raw fastq files <br/> **(Fastqc - run_fastqc.sh)**  |  Somatic Variant Calling and filtration <br/> **(SomVaRIUS - run_somvarius_and_Filter_tumor_only.sh)** | Variant Gain/Loss (Parental vs Treated) <br/> **(run_variants_gain_loss_treatment.vs.Parental.AF.0.05.sh)** | Mutation Signature Deconvolution <br/> **(run_deconstructsigshg38.sh)**
 Adapter & low quality reads trimming <br/> **(Trimgalore - run_trim_galore.sh)** |  Removing Germline SNP/INDEL variants <br/> **(For human - run_remove_hg38_germline_dbsnp.sh)**
 Trimmed fastq to uBAM format conversion <br/> **(required by GATK pipeline - run_fastq_to_uBAM.sh)**  |  ENSEMBL VEP variant annotation & type filtration <br/> **(missense, frameshit, nonsynonymous, etc. - run_VEP_annotation_hg38_tumor_only_AF_0.05.sh)**
 BWA MEM alignment to GRCm38/mm10 <br/> **(BWA MEM - run_bwa_mem.sh)**  |  Extra manual filtrations by quality <br/> **(AD, MBQ, MMQ, MPOS5, etc. - run_VEP_annotation_hg38_tumor_only_AF_0.05.sh)**
@@ -43,7 +43,7 @@ Hybrid selection quality metrics collection <br/> **(GATK HsMetrics - run_Collec
 Estimate and Apply MarkDuplicate and <br/> Base Quality Score recalibration <br/> **(GATK MarkDuplicate, BQSR  - run_markduplicate.sh)**  |  
 
 
-Table 2. Sample Comparison Manifest file as a template
+**Table 2. Sample Comparison Manifest file as a template**
 **Parental Sample** | **Treated Sample**
 ------------------- | ------------------
 Sample_SW480_P8W_IGO_10212_G_2 | Sample_SW480_P0W_IGO_10212_G_1
@@ -51,7 +51,7 @@ Sample_SW480_P8W_IGO_10212_G_2 | Sample_SW480_TMZ8W_IGO_10212_G_3
 Sample_SW480_P8W_IGO_10212_G_2 | Sample_SW480_CDDP8W_IGO_10212_G_4
 Sample_SW480_P8W_IGO_10212_G_2 | Sample_SW480_COMBO8W_IGO_10212_G_5
 
-Table 3. Mutation Signature Manifest file as a template
+**Table 3. Mutation Signature Manifest file as a template**
 **cats** | **comparison** | **files**
 -------- | -------------- | ---------
 Sample_SW480_COMBO8W_IGO_10212_G_5 | loss | PITT_0522/Sample_SW480_COMBO8W_IGO_10212_G_5_vs_Sample_SW480_P8W_IGO_10212_G_2.VEP.ann.AF0.05_BQ20_MQ50.vcf
@@ -65,6 +65,7 @@ Sample_SW480_CDDP8W_IGO_10212_G_4 | total | PITT_0522/Sample_SW480_CDDP8W_IGO_10
 
 * The entire pipeline was built on MSK High Performance Computing (HPC) platform with all the individual building blocks/tools developed in worry-free encapsulated enviroment (Singularity). So, there is little dependency to the system we log in on Lilac, which means, **_anyone with an active Lilac account and basic skill of linux_** can easily run it without any bothering of environment/parameters tuning.
 * The input data structure needs to be organized as following, so that the pipeline can locate the pair-end fastq files in gz format in each sample folder.
+
 ```
 DATA_PATH/
 |-- PROJECT/
@@ -81,17 +82,21 @@ DATA_PATH/
 **Main Pipeline Usage (Primary Analysis Only!)**
 
 &nbsp;&nbsp;&nbsp;&nbsp;
-The pipeline is automatically implemented in four steps using the following 4 batch scripts respectively: 
-* step1_preprocessing.sh
-* step2_Mutect2_VEP.sh
+The entire pipeline is split into the following four steps for the sake of efficient debugging and implementation. The operator will need to supervise the successful execution of each step by lauching subsequent one. There is one batch script linked to each of the 4 steps respectively as shown below. 
+* step1_preprocessing_simple.sh
+* step2_SomVarIUS_VEP_simple.sh
+* step3_gain_loss_VEP_simple.sh
+* step4_MutSig_deconstruction.sh
 
 &nbsp;&nbsp;&nbsp;&nbsp;
-Please first copy all the shell scripts into a folder as your working directory and launch the 2 steps from there! Each step consists of multiple heavy-load tasks, which take long time to accomplish. Please be sure to wait till the step1 to be successfully accomplished before the step2 could be launched. While I don't expect end users to trouble shoot any errors that cause interruption of the pipeline, the pipeline does log the  running status and errors in a log file named like "nohup_step1_*.log" or "nohup_step2_*.log". A note message "Mission Accomplished!" at the end of the log file indicates the success of the step. Make sure you see it before you go to next step.
+Please first copy the above shell scripts into a folder (e.g. data_analysis) as your working directory to launch these 4 steps! Each step consists of multiple heavy-load tasks, which take time to accomplish. Please be patient to wait till one step ends successfully before kicking off next step. While I don't expect end users to debug any errors which interrupt the pipeline, the pipeline does log the job status and errors in a log file named like "nohup_step_*.log". A note message "Mission Accomplished!" at the end of the log file indicates the success of the step. Make sure you see it before you go to next step.
   
-```  
+```
+  You can write your own loop to run the pipeline for multiple samples. The following USAGE example is for single-sample only.
+  
   # preprocessing
   .USAGE.
-  nohup sh step1_preprocessing.sh DATA_PATH PROJECT SUBJECT SAMPLE 2>&1 >nohup_step1_SAMPLE.log &
+  nohup sh step1_preprocessing_simple.sh DATA_PATH PROJECT SUBJECT SAMPLE 2>&1 >nohup_step1_SAMPLE.log &
   
   .OPTIONS.
   DATA_PATH  a root directory of the entire study, required.             e.g. /home/luol2/lingqi_workspace/Projects/Ben_Projects
@@ -100,12 +105,24 @@ Please first copy all the shell scripts into a folder as your working directory 
   SAMPLE     a sample name, required.                                    e.g. Sample_CT26CDDP_M1_IGO_10212_E_13
   
   
-  # Mutect2 calling & VEP annotation
-  nohup sh step2_Mutect2_VEP.sh DATA_PATH PROJECT SUBJECT SAMPLE NORMAL_SAMPLE 2>&1 >nohup_step2_SAMPLE.log &
+  # SomVaRIUS calling & VEP annotation
+  nohup sh step2_SomVarIUS_VEP_simple.sh DATA_PATH PROJECT SUBJECT SAMPLE 2>&1 >nohup_step2_SAMPLE.log &
   
   .OPTIONS.
-  Same as the options in step 1, except the name of the normal sample (NORMAL_SAMPLE) is required here
-  and the normal sample needs to be in the same SUBJECT folder as SAMPLE
+  Same as the options in step 1
+
+  # Variant Gain/Loss analysis (e.g. Parental vs Treated) & VEP annotation 
+  nohup sh step3_gain_loss_VEP_simple.sh DATA_PATH PROJECT SUBJECT PARENTAL TREATED 2>&1 >nohup_step3_PARENTAL_vs_TREATED.log &
+  
+  .OPTIONS.
+  Same as the options in step 1, except that you need to specify both PARENTAL and TREATED sample for comparison. Loop through a manifest comparison file as Table 2 above to run the annotated gain/loss analysis as many as you want
+  
+  # Mutation Signature analysis (deconstructSigs)
+  nohup sh step4_MutSig_deconstruction.sh PROJECT_PATH MANIFEST 2>&1 >nohup_step4_MutSig.log
+  
+  .OPTIONS.
+  PROJECT_PATH  a directory of the project where the samples are located and a SIGNATURE sub-directory can be created         e.g. /home/luol2/lingqi_workspace/Projects/Ben_Projects/WES_human_Project_10212_G
+  MANIFEST      a file recording the samples, variant types whose signatures are to be analyzed, together with file locations to the VCF files           e.g. Table 3 above shows an example  
   
 ```
 
