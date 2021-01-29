@@ -31,7 +31,7 @@ The entire pipeline was built refering both GATK Best Practice for somatic calli
   
   * `step4_MutSig_deconstruction.sh` -- it takes a manifest file (as shown in the template table below) recording vcf files for the individual samples and gain/loss comparisons, deconstruct and plot the mutation signatures
     
-**Table 1. Description of the workflow on the above-mention 4 steps**
+**Table 1. Description of the workflow on the above 4 steps**
 Step1: Data Quality Checking & Preprocessing  |  Step2: Variant Calling, filtering & Annotation | Step3: Variant Gain/Loss Comparison (e.g. Parental v.s. Treated) | Step4: Mutation Signature Deconvolution
 -------------------------------------------   |  ---------------------------------------------- |  --------------------------------------------------------------- | ----------------------------------------
 Quality checking of raw fastq files <br/> **(Fastqc - run_fastqc.sh)**  |  Somatic Variant Calling and filtration <br/> **(SomVaRIUS - run_somvarius_and_Filter_tumor_only.sh)** | Variant Gain/Loss (Parental vs Treated) <br/> **(run_variants_gain_loss_treatment.vs.Parental.AF.0.05.sh)** | Mutation Signature Deconvolution <br/> **(run_deconstructsigshg38.sh)**
@@ -73,9 +73,7 @@ DATA_PATH/
 |       |-- SAMPLE/
 |           |-- *R1*fastq.gz
 |           |-- *R2*fastq.gz
-|       |-- NORMAL_SAMPLE/
-|           |-- *R1*fastq.gz
-|           |-- *R2*fastq.gz
+
 ```
 
 
@@ -118,11 +116,11 @@ Please first copy the above shell scripts into a folder (e.g. data_analysis) as 
   Same as the options in step 1, except that you need to specify both PARENTAL and TREATED sample for comparison. Loop through a manifest comparison file as Table 2 above to run the annotated gain/loss analysis as many as you want
   
   # Mutation Signature analysis (deconstructSigs)
-  nohup sh step4_MutSig_deconstruction.sh PROJECT_PATH MANIFEST 2>&1 >nohup_step4_MutSig.log
+  nohup sh step4_MutSig_deconstruction.sh DATA_PATH PROJECT MANIFEST 2>&1 >nohup_step4_MutSig.log
   
   .OPTIONS.
-  PROJECT_PATH  a directory of the project where the samples are located and a SIGNATURE sub-directory can be created         e.g. /home/luol2/lingqi_workspace/Projects/Ben_Projects/WES_human_Project_10212_G
-  MANIFEST      a file recording the samples, variant types whose signatures are to be analyzed, together with file locations to the VCF files           e.g. Table 3 above shows an example  
+  Same as the option in step 1, except
+  MANIFEST      a file recording the samples, variant types whose signatures are to be analyzed, together with file locations to the VCF files           e.g. **data_analysis/items_to_plots_MutSig.txt** Table 3 above shows an example
   
 ```
 
