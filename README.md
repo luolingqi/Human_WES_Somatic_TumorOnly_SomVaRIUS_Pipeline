@@ -50,7 +50,7 @@ Step1: Data Quality Checking & Preprocessing  |  Step2: Variant Calling, filteri
 Quality checking of raw fastq files <br/> **(Fastqc - run_fastqc.sh)**  |  Somatic Variant Calling and filtration <br/> **(SomVaRIUS - run_somvarius_and_Filter_tumor_only.sh)** | Variant Gain/Loss (Parental vs Treated) <br/> **(run_variants_gain_loss_treatment.vs.Parental.AF.0.05.sh)** | Mutation Signature Deconvolution <br/> **(run_deconstructsigshg38.sh)**
 Adapter & low quality reads trimming <br/> **(Trimgalore - run_trim_galore.sh)** |  Removing Germline SNP/INDEL variants <br/> **(For human - run_remove_hg38_germline_dbsnp.sh)**
 Trimmed fastq to uBAM format conversion <br/> **(required by GATK pipeline - run_fastq_to_uBAM.sh)**  |  ENSEMBL VEP variant annotation & type filtration <br/> **(missense, frameshit, nonsynonymous, etc. - run_VEP_annotation_hg38_tumor_only_AF_0.05.sh)**
-BWA MEM alignment to GRCm38/mm10 <br/> **(BWA MEM - run_bwa_mem.sh)**  |  Extra manual filtrations by quality <br/> **(AD, MBQ, MMQ, MPOS5, etc. - run_VEP_annotation_hg38_tumor_only_AF_0.05.sh)**
+BWA MEM alignment to GRCh38 <br/> **(BWA MEM - run_bwa_mem.sh)**  |  Extra manual filtrations by quality <br/> **(AD, MBQ, MMQ, MPOS5, etc. - run_VEP_annotation_hg38_tumor_only_AF_0.05.sh)**
 Alignment quality metrics collection <br/> **(Qualimap - run_qualimap.sh)**  |  
 Hybrid selection quality metrics collection <br/> **(GATK HsMetrics - run_CollectHsMetrics.sh)**  |  
 Estimate and Apply MarkDuplicate and <br/> Base Quality Score recalibration <br/> **(GATK MarkDuplicate, BQSR  - run_markduplicate.sh)**  |  
